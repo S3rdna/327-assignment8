@@ -40,7 +40,7 @@ def ListenOnTCP(tcpSocket: socket.socket, socketAddress):
     if (payload == 'exit'):
         exitSignal = 1
         print('exit wopped')
-    print('current payload {}'.format(paylaod))
+    print('current payload {}'.format(payload))
     reply = payload.upper().encode('utf-8')
     tcpSocket.send(reply)
     print('Original: {} ; Reply: {}',payload,reply)
@@ -68,6 +68,7 @@ def LaunchTCPThreads():
         connectionThread.start();
 
 if __name__ == "__main__":
+    exitSignal = 0
     tcpThread = threading.Thread(target=LaunchTCPThreads);
     tcpThread.start();
 

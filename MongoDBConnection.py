@@ -5,9 +5,9 @@ import pymongo
 from datetime import datetime, timedelta
 import time
 
-DBName = "test" #Use this to change which Database we're accessing
-connectionURL = "[DatabaseURL]@[Database]" #Put your database URL here
-sensorTable = "sensor data table" #Change this to the name of your sensor data table
+DBName = "Assignment7" #Use this to change which Database we're accessing
+connectionURL = "mongodb+srv://aaguilar8079:testpass1@assignment7.qbbprzc.mongodb.net/?retryWrites=true&w=majority&appName=Assignment7" #Put your database URL here
+sensorTable = "Traffic Sensor Data" #Change this to the name of your sensor data table
 
 def QueryToList(query):
   pass; #TODO: Convert the query that you get in this function to a list and return it
