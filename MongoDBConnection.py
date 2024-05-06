@@ -15,11 +15,29 @@ connectionURL = os.getenv("mongoURL")
 # Change this to the name of your sensor data table
 sensorTable = "Traffic Sensor Data"
 
+class Payload:
+    def __init__(self,timestamp,topic,uid,sensor_data):
+        self.timestamp = timestamp
+        self.topic = topic
+        self.device_asset_uid = uid
+        self.sensor_data = sensor_data
+    def __str__(self):
+        return "Timestamp: {}\n\tTopic: {}\n\tDevice Asset UID: {}\n\tSensor Data: {}".format(self.timestamp,self.topic,self.device_asset_uid,self.sensor_data)
+
+    def __repr__(self):
+        return "Timestamp: {}\n\tTopic: {}\n\tDevice Asset UID: {}\n\tSensor Data: {}".format(self.timestamp,self.topic,self.device_asset_uid,self.sensor_data)
+
 
 def QueryToList(query):
     retlist = []
     for i in query:
-        retlist.append(i['payload'])
+        timestamp = i['payload']['timestamp']
+        topic = i['payload']['topic']
+        device_asset_uid = i['payload']['device_asset_uid']
+        sensor_data = list(i['payload'].items())[-1]
+        payload = Payload(timestamp, topic, device_asset_uid, sensor_data)
+
+        retlist.append(payload)
     return retlist
 
 
