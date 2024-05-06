@@ -4,17 +4,23 @@ import threading
 import pymongo
 from datetime import datetime, timedelta
 import time
+from dotenv import load_dotenv
+import os 
 
-DBName = "Assignment7"  # Use this to change which Database we're accessing
+load_dotenv()
+
+DBName = "test"  # Use this to change which Database we're accessing
 # Put your database URL here
-connectionURL = "mongodb+srv://aaguilar8079:testpass1@assignment7.qbbprzc.mongodb.net/?retryWrites=true&w=majority&appName=Assignment7"
+connectionURL = os.getenv("mongoURL")
 # Change this to the name of your sensor data table
 sensorTable = "Traffic Sensor Data"
 
 
 def QueryToList(query):
-    pass  # TODO: Convert the query that you get in this function to a list and return it
-    # HINT: MongoDB queries are iterable
+    retlist = []
+    for i in query:
+        retlist.append(i['payload'])
+    return retlist
 
 
 def QueryDatabase() -> []:
@@ -31,6 +37,7 @@ def QueryDatabase() -> []:
         cluster = connectionURL
         client = MongoClient(cluster)
         db = client[DBName]
+        ##print("cluster:",cluster,client,db)
         print("Database collections: ", db.list_collection_names())
 
         # We first ask the user which collection they'd like to draw from.
@@ -38,7 +45,7 @@ def QueryDatabase() -> []:
         print("Table:", sensorTable)
         # We convert the cursor that mongo gives us to a list for easier iteration.
         # TODO: Set how many minutes you allow
-        timeCutOff = datetime.now() - timedelta(minutes=0)
+        timeCutOff = datetime.now() - timedelta(minutes=1)
 
         oldDocuments = QueryToList(
             sensorTable.find({"time": {"$gte": timeCutOff}}))
@@ -55,3 +62,8 @@ def QueryDatabase() -> []:
         print("Please make sure that this machine's IP has access to MongoDB.")
         print("Error:", e)
         exit(0)
+
+
+if __name__ == "__main__":
+    QueryDatabase()
+
