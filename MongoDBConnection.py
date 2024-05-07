@@ -17,10 +17,14 @@ sensorTable = "Traffic Sensor Data"
 
 class Payload:
     def __init__(self,timestamp,topic,uid,sensor_data):
-        self.timestamp = timestamp
+        self.timestamp = int(timestamp)
         self.topic = topic
         self.device_asset_uid = uid
         self.sensor_data = sensor_data
+
+    def before5mins(self,other,fiveafter):
+        return  fiveafter > self.timestamp - other.timestamp
+
     def __str__(self):
         return "Timestamp: {}\n\tTopic: {}\n\tDevice Asset UID: {}\n\tSensor Data: {}".format(self.timestamp,self.topic,self.device_asset_uid,self.sensor_data)
 
@@ -36,6 +40,7 @@ def QueryToList(query):
         device_asset_uid = i['payload']['device_asset_uid']
         sensor_data = list(i['payload'].items())[-1]
         payload = Payload(timestamp, topic, device_asset_uid, sensor_data)
+
 
         retlist.append(payload)
     return retlist
@@ -70,9 +75,31 @@ def QueryDatabase() -> []:
         currentDocuments = QueryToList(
             sensorTable.find({"time": {"$lte": timeCutOff}}))
 
-        print("Current Docs:", currentDocuments)
-        print("Old Docs:", oldDocuments)
+        ##print("Current Docs: {}".format (currentDocuments))
+        ##print("Old Docs: {}".format(oldDocuments))
 
+        data_temp = {}
+        ##TODO: based off last entry should be off 5minsafternow > abs(self.timestamp - other.timestamp)
+        cur_payload = None
+        five_after =  None
+
+        for i in currentDocuments:
+            if cur_payload == None:
+                cur_payload =  i
+                five_after = (cur_payload.timestamp) + 300
+
+            elif cur_payload.before5mins(i,five_after):
+                print("here")
+                data_temp[i.sensor_data[0]] = i.sensor_data[1]
+
+                if i.sensor_data[0] + "-count" in data_temp:
+                    data_temp[i.sensor_data[0] + "-count"] = 1
+                else:
+                    data_temp[i.sensor_data[0] + "-count"] += 1
+
+        print (data_temp)
+
+        
         # TODO: Parse the documents that you get back for the sensor data that you need
         # Return that sensor data as a list
 
