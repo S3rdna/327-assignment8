@@ -5,7 +5,7 @@ import pymongo
 from datetime import datetime, timedelta
 import time
 from dotenv import load_dotenv
-import os 
+import os
 
 load_dotenv()
 
@@ -15,21 +15,22 @@ connectionURL = os.getenv("mongoURL")
 # Change this to the name of your sensor data table
 sensorTable = "Traffic Sensor Data"
 
+
 class Payload:
-    def __init__(self,timestamp,topic,uid,sensor_data):
+    def __init__(self, timestamp, topic, uid, sensor_data):
         self.timestamp = int(timestamp)
         self.topic = topic
         self.device_asset_uid = uid
         self.sensor_data = sensor_data
 
-    def before5mins(self,other,fiveafter):
-        return  fiveafter > self.timestamp - other.timestamp
+    def before5mins(self, other, fiveafter):
+        return fiveafter > self.timestamp - other.timestamp
 
     def __str__(self):
-        return "Timestamp: {}\n\tTopic: {}\n\tDevice Asset UID: {}\n\tSensor Data: {}".format(self.timestamp,self.topic,self.device_asset_uid,self.sensor_data)
+        return "Timestamp: {}\n\tTopic: {}\n\tDevice Asset UID: {}\n\tSensor Data: {}".format(self.timestamp, self.topic, self.device_asset_uid, self.sensor_data)
 
     def __repr__(self):
-        return "Timestamp: {}\n\tTopic: {}\n\tDevice Asset UID: {}\n\tSensor Data: {}".format(self.timestamp,self.topic,self.device_asset_uid,self.sensor_data)
+        return "Timestamp: {}\n\tTopic: {}\n\tDevice Asset UID: {}\n\tSensor Data: {}".format(self.timestamp, self.topic, self.device_asset_uid, self.sensor_data)
 
 
 def QueryToList(query):
@@ -40,7 +41,6 @@ def QueryToList(query):
         device_asset_uid = i['payload']['device_asset_uid']
         sensor_data = list(i['payload'].items())[-1]
         payload = Payload(timestamp, topic, device_asset_uid, sensor_data)
-
 
         retlist.append(payload)
     return retlist
@@ -60,7 +60,7 @@ def QueryDatabase() -> []:
         cluster = connectionURL
         client = MongoClient(cluster)
         db = client[DBName]
-        ##print("cluster:",cluster,client,db)
+        # print("cluster:",cluster,client,db)
         print("Database collections: ", db.list_collection_names())
 
         # We first ask the user which collection they'd like to draw from.
@@ -75,32 +75,39 @@ def QueryDatabase() -> []:
         currentDocuments = QueryToList(
             sensorTable.find({"time": {"$lte": timeCutOff}}))
 
-        ##print("Current Docs: {}".format (currentDocuments))
-        ##print("Old Docs: {}".format(oldDocuments))
+        # print("Current Docs: {}".format (currentDocuments))
+        # print("Old Docs: {}".format(oldDocuments))
 
         data_temp = {}
-        ##TODO: based off last entry should be off 5minsafternow > abs(self.timestamp - other.timestamp)
+        # TODO: based off last entry should be off 5minsafternow > abs(self.timestamp - other.timestamp)
         cur_payload = None
-        five_after =  None
+        five_after = None
 
         for i in currentDocuments[::-1]:
             if cur_payload == None:
-                cur_payload =  i
+                cur_payload = i
                 five_after = (cur_payload.timestamp) + 300
 
-            elif cur_payload.before5mins(i,five_after):
+            elif cur_payload.before5mins(i, five_after):
+                key = i.sensor_data[0]
+                val = i.sensor_data[1]
                 print("here")
-                data_temp[i.sensor_data[0]] = i.sensor_data[1]
-
-                ##err here?
-                if i.sensor_data[0] + "-count" in data_temp:
-                    data_temp[i.sensor_data[0] + "-count"] = 1
+                if key not in data_temp:
+                    data_temp[key] = i.sensor_data[1]
+                    data_temp[key+"-count"] = 1
                 else:
-                    data_temp[i.sensor_data[0] + "-count"] += 1
+                    data_temp[key] += i.sensor_data[1]
+                    data_temp[key+"-count"] += 1
 
-        print (data_temp)
+                # err here?
+                # if str(i.sensor_data[0]) + "-count" in data_temp:
+                #   data_temp[i.sensor_data[0] + "-count"] = 1
+                # else:
+                #   data_temp[i.sensor_data[0] + "-count"] += 1
 
-        
+        print(data_temp)
+        print("avgs {}, {}, {}".format(data_temp))
+
         # TODO: Parse the documents that you get back for the sensor data that you need
         # Return that sensor data as a list
 
@@ -112,4 +119,3 @@ def QueryDatabase() -> []:
 
 if __name__ == "__main__":
     QueryDatabase()
-
