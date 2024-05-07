@@ -83,7 +83,7 @@ def QueryDatabase() -> []:
         cur_payload = None
         five_after =  None
 
-        for i in currentDocuments:
+        for i in currentDocuments[::-1]:
             if cur_payload == None:
                 cur_payload =  i
                 five_after = (cur_payload.timestamp) + 300
@@ -92,6 +92,7 @@ def QueryDatabase() -> []:
                 print("here")
                 data_temp[i.sensor_data[0]] = i.sensor_data[1]
 
+                ##err here?
                 if i.sensor_data[0] + "-count" in data_temp:
                     data_temp[i.sensor_data[0] + "-count"] = 1
                 else:
