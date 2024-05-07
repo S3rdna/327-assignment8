@@ -78,12 +78,38 @@ def QueryDatabase() -> []:
         # print("Current Docs: {}".format (currentDocuments))
         # print("Old Docs: {}".format(oldDocuments))
 
+
+
+        cur_avgs = (getAvgs(currentDocuments))
+        old_avgs = (getAvgs(oldDocuments))
+
+        return [cur_avgs,old_avgs]
+         
+        #print("cur avgs",cur_avgs)
+        #print("old avgs",old_avgs)
+
+    
+            
+
+
+
+
+        # TODO: Parse the documents that you get back for the sensor data that you need
+        # Return that sensor data as a list
+
+    except Exception as e:
+        print("Please make sure that this machine's IP has access to MongoDB.")
+        print("Error:", e)
+        exit(0)
+
+
+def getAvgs(l):
         data_temp = {}
         # TODO: based off last entry should be off 5minsafternow > abs(self.timestamp - other.timestamp)
         cur_payload = None
         five_after = None
 
-        for i in currentDocuments[::-1]:
+        for i in l[::-1]:
             if cur_payload == None:
                 cur_payload = i
                 five_after = (cur_payload.timestamp) + 300
@@ -91,7 +117,6 @@ def QueryDatabase() -> []:
             elif cur_payload.before5mins(i, five_after):
                 key = i.sensor_data[0]
                 val = i.sensor_data[1]
-                print("here")
                 if key not in data_temp:
                     data_temp[key] = i.sensor_data[1]
                     data_temp[key+"-count"] = 1
@@ -115,21 +140,7 @@ def QueryDatabase() -> []:
             sensor_count = counts[sensor_name+"-count"]
             avgs[sensor_name] = sensor_val/sensor_count
 
-        print(avgs)
-
-            
-
-
-
-
-        # TODO: Parse the documents that you get back for the sensor data that you need
-        # Return that sensor data as a list
-
-    except Exception as e:
-        print("Please make sure that this machine's IP has access to MongoDB.")
-        print("Error:", e)
-        exit(0)
-
+        return avgs
 
 if __name__ == "__main__":
-    QueryDatabase()
+    print(QueryDatabase())

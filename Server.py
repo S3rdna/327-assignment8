@@ -39,7 +39,7 @@ def ListenOnTCP(tcpSocket: socket.socket, socketAddress):
         exitSignal = 1
         print('exit wopped')
     print('current payload {}'.format(payload))
-    reply = payload.upper().encode('utf-8')
+    reply = str(GetServerData()).encode('utf-8')
     tcpSocket.send(reply)
     print('Original: {} ; Reply: {}'.format(str(payload), str(reply)))
     # TODO: Implement TCP Code, use GetServerData to query the database.
