@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import time
 from dotenv import load_dotenv
 import os
+import certifi
 
 load_dotenv()
 
@@ -60,7 +61,7 @@ def QueryDatabase() -> []:
     print("in query:",DBName,connectionURL,sensorTableName,cluster,client,db)
     try:
         cluster = connectionURL
-        client = MongoClient(cluster)
+        client = MongoClient(cluster,tlsCAFile=certifi.where())
         db = client[DBName]
         # print("cluster:",cluster,client,db)
         print("Database collections: ", db.list_collection_names())
