@@ -9,11 +9,11 @@ import os
 
 load_dotenv()
 
-DBName = "test"  # Use this to change which Database we're accessing
+DBName = os.getenv("DBname")  # Use this to change which Database we're accessing
 # Put your database URL here
 connectionURL = os.getenv("mongoURL")
 # Change this to the name of your sensor data table
-sensorTable = "Traffic Sensor Data"
+sensorTable = os.getenv("TABLEname")
 
 
 class Payload:
