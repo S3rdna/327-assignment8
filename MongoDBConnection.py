@@ -99,14 +99,28 @@ def QueryDatabase() -> []:
                     data_temp[key] += i.sensor_data[1]
                     data_temp[key+"-count"] += 1
 
-                # err here?
-                # if str(i.sensor_data[0]) + "-count" in data_temp:
-                #   data_temp[i.sensor_data[0] + "-count"] = 1
-                # else:
-                #   data_temp[i.sensor_data[0] + "-count"] += 1
+        amounts = {}
+        counts = {}
+        for i in data_temp.items():
+            if "count" in i[0]:
+                counts[i[0]] = i[1]
+            else:
+                amounts[i[0]] = i[1]
 
-        print(data_temp)
-        print("avgs {}, {}, {}".format(data_temp))
+        # get avgs 
+        avgs = {}
+        for i in amounts.items():
+            sensor_name = i[0]
+            sensor_val = i[1]
+            sensor_count = counts[sensor_name+"-count"]
+            avgs[sensor_name] = sensor_val/sensor_count
+
+        print(avgs)
+
+            
+
+
+
 
         # TODO: Parse the documents that you get back for the sensor data that you need
         # Return that sensor data as a list
