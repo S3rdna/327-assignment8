@@ -10,7 +10,7 @@ import sys
 
 maxPacketSize = 1024
 defaultPort = 8888  # TODO: Set this to your preferred port
-
+exitSignal = 0
 
 def GetFreePort(minPort: int = 1024, maxPort: int = 65535):
     for i in range(minPort, maxPort):
@@ -34,14 +34,18 @@ def GetServerData() -> []:
 
 
 def ListenOnTCP(tcpSocket: socket.socket, socketAddress):
+    global exitSignal
     payload = str(tcpSocket.recv(1024).decode())
     if (payload == 'exit'):
         exitSignal = 1
+        tcpSocket.send("exited".encode('utf-8'))
         print('exit wopped')
+        return
     print('current payload {}'.format(payload))
     reply = str(GetServerData()).encode('utf-8')
     tcpSocket.send(reply)
     print('Original: {} ; Reply: {}'.format(str(payload), str(reply)))
+    exit()
     # TODO: Implement TCP Code, use GetServerData to query the database.
 
 
@@ -71,3 +75,5 @@ if __name__ == "__main__":
     while not exitSignal:
         time.sleep(1)
     print("Ending program by exit signal...")
+    tcpThread.join()
+    exit()

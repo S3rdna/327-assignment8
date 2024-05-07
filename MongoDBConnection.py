@@ -13,7 +13,7 @@ DBName = os.getenv("DBname")  # Use this to change which Database we're accessin
 # Put your database URL here
 connectionURL = os.getenv("mongoURL")
 # Change this to the name of your sensor data table
-sensorTable = os.getenv("TABLEname")
+sensorTableName = os.getenv("TABLEname")
 
 
 class Payload:
@@ -52,10 +52,12 @@ def QueryDatabase() -> []:
     global currentDBName
     global running
     global filterTime
-    global sensorTable
+    global sensorTableName
+    sensorTable = None
     cluster = None
     client = None
     db = None
+    print("in query:",DBName,connectionURL,sensorTableName,cluster,client,db)
     try:
         cluster = connectionURL
         client = MongoClient(cluster)
@@ -64,7 +66,7 @@ def QueryDatabase() -> []:
         print("Database collections: ", db.list_collection_names())
 
         # We first ask the user which collection they'd like to draw from.
-        sensorTable = db[sensorTable]
+        sensorTable = db[sensorTableName]
         print("Table:", sensorTable)
         # We convert the cursor that mongo gives us to a list for easier iteration.
         # TODO: Set how many minutes you allow
